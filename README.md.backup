@@ -1,0 +1,322 @@
+# InfoPanel.PluginUpdateNotifier# InfoPanel.PluginUpdateNotifier
+
+
+
+A background utility plugin for [InfoPanel](https://github.com/habibrehmansg/InfoPanel) that automatically monitors installed plugins and notifies you when updates are available on GitHub.## Overview
+
+**InfoPanel.PluginUpdateNotifier** is a background utility plugin for [InfoPanel](https://github.com/habibrehmansg/InfoPanel) that automatically checks for **new versions of installed plugins**.  
+
+![GitHub release](https://img.shields.io/github/v/release/F3NN3X/InfoPanel.PluginUpdateNotifier?style=flat-square)It reads metadata from each plugin’s `PluginInfo.ini`, compares the version with the latest release (via GitHub), and displays a **Windows notification** when updates are available.
+
+![License](https://img.shields.io/github/license/F3NN3X/InfoPanel.PluginUpdateNotifier?style=flat-square)
+
+This helps users keep all their InfoPanel plugins up-to-date without manually visiting each repository.
+
+## 📋 Overview
+
+---
+
+**InfoPanel.PluginUpdateNotifier** scans all your installed InfoPanel plugins, checks their GitHub repositories for new releases, and displays **Windows toast notifications** when updates are available. No more manual checking—stay up-to-date effortlessly!
+
+## ✨ Features
+
+### How It Works- Scans all installed plugins in `C:\ProgramData\InfoPanel\plugins`
+
+1. **Scans** `C:\ProgramData\InfoPanel\plugins` every 24 hours- Reads each plugin’s `PluginInfo.ini` for:
+
+2. **Reads** each plugin's `PluginInfo.ini` metadata (Name, Version, Website)  - Name  
+
+3. **Checks** GitHub API for the latest release tag  - Version  
+
+4. **Compares** versions using semantic versioning  - Website (used for GitHub lookups)
+
+5. **Notifies** you via Windows toast notification when updates are found- Checks for newer versions from GitHub releases
+
+- Displays native **Windows toast notifications** for updates
+
+---- Runs silently in the background (default: every 24 hours)
+
+- Safe, low CPU usage, and non-intrusive
+
+## ✨ Features
+
+---
+
+- 🔍 **Automatic Scanning** - Monitors all installed plugins in the background
+
+- 🌐 **GitHub Integration** - Checks GitHub releases API for latest versions## 🧩 Example Notification
+
+- 🔔 **Native Notifications** - Windows 10/11 toast notifications> ⚙️ **Plugin Update Available**  
+
+- ⏰ **Configurable Interval** - Default 24-hour check cycle (customizable)> InfoPanel.FPS → New version 1.2.0 available!  
+
+- 🪶 **Lightweight** - Minimal CPU/memory usage, non-intrusive> Click to open download page.
+
+- 🛡️ **Safe & Reliable** - Graceful error handling, continues on network failures
+
+- 📊 **Smart Versioning** - Handles semantic versions (v1.2.3) and string comparisons---
+
+
+
+---## 📁 File Structure
+
+C:\ProgramData\InfoPanel\plugins\InfoPanel.PluginUpdateNotifier
+
+## 🧩 Notification Example│
+
+├── PluginUpdateNotifier.cs
+
+When an update is available, you'll see:├── manifest.json
+
+├── PluginInfo.ini
+
+```└── README.md
+
+⚙️ Plugin Update Available
+
+InfoPanel.FPS## ⚙️ PluginInfo.ini Example
+
+Installed: 1.1.6  →  Latest: 1.2.0```ini
+
+```[PluginInfo]
+
+Name=InfoPanel Plugin Update Notifier
+
+---Author=F3NN3X / Themely.dev
+
+Version=1.0.0
+
+## 🔧 InstallationWebsite=https://github.com/F3NN3X/InfoPanel.PluginUpdateNotifier
+
+Description=Automatically checks for updates for installed InfoPanel plugins.
+
+### Option 1: From Release (Recommended)
+
+1. Download the latest `InfoPanel.PluginUpdateNotifier-v{version}.zip` from [Releases](https://github.com/F3NN3X/InfoPanel.PluginUpdateNotifier/releases)🔧 Installation
+
+2. Extract the folder to:
+
+   ```Download the plugin ZIP release from github.
+
+   C:\ProgramData\InfoPanel\plugins\Extract it to:
+
+   ```C:\ProgramData\InfoPanel\plugins\InfoPanel.PluginUpdateNotifier\
+
+3. Restart InfoPanel
+
+4. The plugin starts automatically and checks for updates every 24 hoursRestart InfoPanel.
+
+The plugin will automatically run and check for updates every 24 hours.
+
+### Option 2: Build from Source
+
+```powershellAI Coding Instructions
+
+# Clone the repository
+
+git clone https://github.com/F3NN3X/InfoPanel.PluginUpdateNotifier.gitUse these as guidance for GitHub Copilot or Cursor when developing or maintaining this plugin.
+
+cd InfoPanel.PluginUpdateNotifier
+
+Primary Goal: Maintain a background InfoPanel plugin that checks for updates and sends Windows notifications.
+
+# Build the plugin
+
+dotnet build -c ReleaseLanguage: C# (.NET 8, Windows)
+
+
+
+# Output location:Entry Point: PluginUpdateNotifier.cs
+
+# bin\Release\net8.0-windows\InfoPanel.PluginUpdateNotifier-v{Version}.zip
+
+```Framework: Must integrate with InfoPanel’s BasePlugin system.
+
+
+
+---Core Services:
+
+
+
+## 📁 Plugin StructurePluginDirectoryService → Scans C:\ProgramData\InfoPanel\plugins
+
+
+
+```VersionCheckService → Uses GitHub API to get latest version tags
+
+C:\ProgramData\InfoPanel\plugins\InfoPanel.PluginUpdateNotifier\
+
+├── InfoPanel.PluginUpdateNotifier.dllNotificationService → Displays Windows toast notifications
+
+├── PluginInfo.ini
+
+├── Microsoft.Toolkit.Uwp.Notifications.dllCycle:
+
+└── (other dependencies)
+
+```On plugin start → initialize background loop
+
+
+
+### PluginInfo.ini FormatEvery 24h → check all plugins → compare versions
+
+```ini
+
+[PluginInfo]If new version found → show toast + log result
+
+Name=InfoPanel.PluginUpdateNotifier
+
+Author=F3NN3XError Handling: Log errors to console, continue operation on network failure.
+
+Version=1.0.0
+
+Website=https://github.com/F3NN3X/InfoPanel.PluginUpdateNotifierNo Blocking Calls: Always use async/await and background tasks.
+
+Description=Automatically checks for updates for installed InfoPanel plugins
+
+```Copilot prompt example:
+
+
+
+**Important**: The `Website` field must be a GitHub repository URL for update checking to work.“Write a C# method that reads PluginInfo.ini from a plugin folder and returns Name, Version, and Website as a struct.”
+
+
+
+---🧱 Dependencies
+
+
+
+## ⚙️ ConfigurationInfoPanel.Plugins (Core framework)
+
+
+
+To change the check interval, modify `CheckIntervalHours` in `PluginUpdateNotifier.cs`:System.Net.Http (GitHub API requests)
+
+
+
+```csharpSystem.Text.Json (Parsing JSON responses)
+
+private const double CheckIntervalHours = 24.0; // Change to desired hours
+
+```Microsoft.Toolkit.Uwp.Notifications (Windows toast notifications)
+
+
+
+Then rebuild and reinstall the plugin.Install via NuGet:
+
+
+
+---dotnet add package Microsoft.Toolkit.Uwp.Notifications
+
+
+
+## 🧱 DependenciesBuild & Release
+
+dotnet build -c Release
+
+- **InfoPanel.Plugins** - Core InfoPanel plugin framework
+
+- **Microsoft.Toolkit.Uwp.Notifications** (v7.1.3) - Windows toast notificationsOutput directory:
+
+- **System.Net.Http** - GitHub API requestsbin\Release\net8.0-windows\InfoPanel.PluginUpdateNotifier-v{Version}\InfoPanel.PluginUpdateNotifier
+
+- **System.Text.Json** - JSON parsing
+
+- **.NET 8.0 Windows** - Target framework🧪 Testing
+
+
+
+---Temporarily change check interval to 1 minute for debugging.
+
+
+
+## 🏗️ Build SystemSimulate older plugin versions in PluginInfo.ini to test notification behavior.
+
+
+
+The project uses custom MSBuild targets for InfoPanel compatibility:Test without internet connection to verify error handling.
+
+- **MoveDependencyFiles** - Flattens all DLLs to root output directory (InfoPanel requires flat structure)
+- **CreateReleaseZip** - Automatically packages plugin as distributable ZIP in Release builds
+
+```powershell
+# Debug build (no ZIP packaging)
+dotnet build
+
+# Release build (creates ZIP)
+dotnet build -c Release
+```
+
+---
+
+## 🧪 Testing & Debugging
+
+### Quick Test
+1. Change `CheckIntervalHours` to `0.016` (≈1 minute)
+2. Modify a test plugin's version to an older number
+3. Rebuild and run - notification should appear within 1 minute
+
+### Debug Workflow
+```csharp
+// Add breakpoint in CheckAllPluginsAsync() after:
+var pluginDirs = Directory.GetDirectories(PluginsPath);
+```
+
+### Test Scenarios
+- ✅ Plugin with GitHub URL and outdated version
+- ✅ Plugin with non-GitHub URL (should skip)
+- ✅ Plugin without PluginInfo.ini (should skip)
+- ✅ Network failure (should log error and continue)
+- ✅ Invalid version format (should use string comparison fallback)
+
+---
+
+## 🔍 How Version Comparison Works
+
+```csharp
+// Example: "v1.1.6" vs "1.2.0"
+1. Strip 'v' prefix: "1.1.6" vs "1.2.0"
+2. Try Version.TryParse() for semantic versioning
+3. Compare using Version objects (1.2.0 > 1.1.6) ✓
+4. Fallback to string comparison if parsing fails
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+---
+
+## 📝 Known Limitations
+
+- Only supports GitHub repositories (no GitLab, Bitbucket, etc.)
+- No GitHub API rate limiting implementation
+- Toast notification button ("Open GitHub") is non-functional
+- No per-plugin exclude/include configuration
+
+---
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) file for details
+
+---
+
+## 👤 Author
+
+**F3NN3X**
+- GitHub: [@F3NN3X](https://github.com/F3NN3X)
+- Website: [Themely.dev](https://themely.dev)
+
+---
+
+## 🙏 Acknowledgments
+
+- [InfoPanel](https://github.com/habibrehmansg/InfoPanel) by habibrehmansg
+- [Microsoft Toolkit](https://github.com/CommunityToolkit/WindowsCommunityToolkit) for UWP notifications
