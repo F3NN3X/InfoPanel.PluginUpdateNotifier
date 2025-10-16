@@ -9,12 +9,12 @@ using System.Reflection;
 using Microsoft.Toolkit.Uwp.Notifications;
 using IniParser;
 using IniParser.Model;
+using InfoPanel.Plugins;
 
 namespace PluginUpdateNotifier
 {
-    public class PluginUpdateNotifier
+    public class PluginUpdateNotifier : BasePlugin
     {
-        private Timer? _timer;
         private readonly HttpClient _http = new HttpClient();
         private const string PluginsPath = @"C:\ProgramData\InfoPanel\plugins";
         private const double DefaultCheckIntervalHours = 24.0;
@@ -22,26 +22,73 @@ namespace PluginUpdateNotifier
         private string? _configFilePath = null;
         private double _checkIntervalHours = DefaultCheckIntervalHours;
 
-        public PluginUpdateNotifier()
+        public override string? ConfigFilePath => _configFilePath;
+        public override TimeSpan UpdateInterval => TimeSpan.FromHours(_checkIntervalHours);
+
+        public PluginUpdateNotifier() : base("Plugin Update Notifier", "Automatically checks for plugin updates on GitHub")
         {
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("InfoPanelPluginUpdateNotifier/1.0");
             LoadConfiguration();
+            RegisterToastActivationHandler();
         }
 
-        // Called when InfoPanel loads the plugin
-        public void OnLoad()
+        // Register the toast notification activation handler once
+        private static void RegisterToastActivationHandler()
         {
-            // Check immediately on startup, then at configured interval
-            _timer = new Timer(async _ => await CheckAllPluginsAsync(),
-                               null,
-                               TimeSpan.Zero,
-                               TimeSpan.FromHours(_checkIntervalHours));
+            ToastNotificationManagerCompat.OnActivated += toastArgs =>
+            {
+                try
+                {
+                    var args = ToastArguments.Parse(toastArgs.Argument);
+                    Console.WriteLine($"[PluginUpdateNotifier] Toast activated with args: {toastArgs.Argument}");
+                    
+                    if (args.Contains("action") && args["action"] == "viewRelease")
+                    {
+                        if (args.Contains("url"))
+                        {
+                            string url = args["url"];
+                            Console.WriteLine($"[PluginUpdateNotifier] Opening URL: {url}");
+                            
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                            {
+                                FileName = url,
+                                UseShellExecute = true
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[PluginUpdateNotifier] Toast activation error: {ex.Message}");
+                }
+            };
         }
 
-        // Called when InfoPanel unloads the plugin
-        public void OnUnload()
+        public override void Initialize()
         {
-            _timer?.Dispose();
+            // Initialization logic if needed
+        }
+
+        public override void Load(List<IPluginContainer> containers)
+        {
+            // This plugin doesn't create any UI containers
+            // It runs silently in the background
+            // InfoPanel will call UpdateAsync() based on UpdateInterval
+        }
+
+        public override void Update()
+        {
+            // Synchronous update - not used for this plugin
+        }
+
+        public override async Task UpdateAsync(CancellationToken cancellationToken)
+        {
+            // Asynchronous update - called by InfoPanel at UpdateInterval
+            await CheckAllPluginsAsync();
+        }
+
+        public override void Close()
+        {
             _http?.Dispose();
         }
 
@@ -71,7 +118,7 @@ namespace PluginUpdateNotifier
                             string latestVersion = await GetLatestReleaseTagAsync(repo);
                             if (!string.IsNullOrEmpty(latestVersion) && IsNewerVersion(latestVersion, info.Version))
                             {
-                                ShowUpdateNotification(info.Name, info.Version, latestVersion);
+                                ShowUpdateNotification(info.Name, info.Version, latestVersion, info.Website);
                             }
                         }
                     }
@@ -150,17 +197,23 @@ namespace PluginUpdateNotifier
             }
         }
 
-        private static void ShowUpdateNotification(string name, string current, string latest)
+        private static void ShowUpdateNotification(string name, string current, string latest, string githubUrl)
         {
             try
             {
+                // Build the releases URL
+                string releasesUrl = githubUrl.TrimEnd('/') + "/releases";
+                
+                Console.WriteLine($"[PluginUpdateNotifier] Showing notification for {name}");
+                Console.WriteLine($"[PluginUpdateNotifier] Releases URL: {releasesUrl}");
+                
                 new ToastContentBuilder()
                     .AddText($"{name} Update Available")
                     .AddText($"Installed: {current}  →  Latest: {latest}")
                     .AddButton(new ToastButton()
                         .SetContent("Open GitHub")
-                        .AddArgument("action", "open")
-                        .AddArgument("plugin", name))
+                        .AddArgument("action", "viewRelease")
+                        .AddArgument("url", releasesUrl))
                     .Show();
             }
             catch (Exception ex)
