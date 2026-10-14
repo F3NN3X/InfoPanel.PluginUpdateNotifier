@@ -63,7 +63,7 @@ cd InfoPanel.PluginUpdateNotifier
 dotnet build -c Release
 
 # The output ZIP will be in:
-# bin\Release\net8.0-windows10.0.19041.0\InfoPanel.PluginUpdateNotifier-v{Version}.zip
+# InfoPanel.PluginUpdateNotifier\bin\Release\net8.0-windows10.0.19041.0\InfoPanel.PluginUpdateNotifier-v{Version}.zip
 ```
 
 ---
