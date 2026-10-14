@@ -68,6 +68,13 @@ dotnet build -c Release
 
 ---
 
+## Releasing
+
+1. Bump `<Version>` in `InfoPanel.PluginUpdateNotifier/InfoPanel.PluginUpdateNotifier.csproj` and `Version` in `PluginInfo.ini`, and add a `CHANGELOG.md` entry for the new version.
+2. Commit, then push a tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+The `Release Build` workflow builds the plugin, checks the tag matches the csproj version, and publishes the zip as a GitHub release. The plugin API comes from the committed `Libs/InfoPanel.Plugins.dll`, so no local InfoPanel checkout is needed.
+
 ## ⚙️ Configuration
 
 The plugin's behavior can be customized via a configuration file, which is automatically created with default values on the first run.
